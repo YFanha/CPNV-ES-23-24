@@ -1,2 +1,4 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+STO1-Debian-12.1.ova filter=lfs diff=lfs merge=lfs -text
+*.ova filter=lfs diff=lfs merge=lfs -text
