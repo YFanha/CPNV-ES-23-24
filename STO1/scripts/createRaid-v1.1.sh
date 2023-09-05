@@ -37,7 +37,7 @@ done
 # Remove all options passed by getopts options
 shift "$(($OPTIND -1))"
 
-function createRaid(){
+function createRaid{
 	echo "${#disks[@]}"
 	
 	nbrDisks=${#disks[@]}
