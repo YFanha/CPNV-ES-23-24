@@ -69,6 +69,7 @@ function createRaid(){
   echo "RAID device name : $raidDevice"
   echo "============================"
 
+  lsblk
 }
 
 if [[ ( "$#" -lt 2 ) || ( "$raidLevel" == '5' && "$#" -lt 3 ) ]]; then
