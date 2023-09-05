@@ -37,31 +37,41 @@ done
 # Remove all options passed by getopts options
 shift "$(($OPTIND -1))"
 
-function createRaid{
-	echo "${#disks[@]}"
+function createRaid(){
 	
-	nbrDisks=${#disks[@]}
+  nbrDisks=${#disks[@]}
 
-	for array in "${disks[@]}"; do
-	    echo $array
-	done	
+  # Create the raid with the disks
+  echo "Creating the RAID..."
+  mdadm --create "$raidDevice" --level="$raidLevel" --raid-devices="${#disks[@]}" "${disks[@]}"
 
-	# Create the raid with the disks
-	mdadm --create $raidDevice --level=$raidLevel --raid-devices=$nbrDisks ${disks[@]}
-	
-	# Format the raid partition
-	mkfs -t $raidFormat $raidDevice
-	
-	raidUUID=$(blkid -o value -s UUID $raidDevice)
-	
-	# Mount the raid
-	mount $raidDevice $raidMountPoint
-	
-	# Entry in /etc/fstab for persitency
-	echo "UUID=$raidUUID $raidMountPoint  ext4 defaults 0 0" >> /etc/fstab
+  # Format the raid partition
+  mkfs -t $raidFormat $raidDevice
+
+  raidUUID=$(blkid -o value -s UUID $raidDevice)
+
+  echo "Mounting the RAID..."
+  # Mount the raid
+  mount $raidDevice $raidMountPoint
+
+  echo "Writing in fstab for persistency..."
+  # Entry in /etc/fstab for persitency
+  echo "UUID=$raidUUID $raidMountPoint  ext4 defaults 0 0" >> /etc/fstab
+
+  # Print infos
+  echo "======== RAID INFOS ========"
+  echo "Following disks used (${#disks[@]}) : "
+  for array in "${disks[@]}"; do
+      echo "        $array"
+  done	
+  echo "File system format : $raidFormat"
+  echo "RAID Type : $raidLevel"
+  echo "RAID device name : $raidDevice"
+  echo "============================"
+
 }
 
-if [[ ( "$#" -lt 2 && ( "$raidLevel" == '1' || "$raidLevel" == '0' )) || ( "$raidLevel" == '5' && "$#" -lt 3 ) ]]; then
+if [[ ( "$#" -lt 2 ) || ( "$raidLevel" == '5' && "$#" -lt 3 ) ]]; then
   echo "Not enough disks specified"
 else
   disks=( "$@" )
