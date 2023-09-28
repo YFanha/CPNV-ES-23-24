@@ -56,7 +56,9 @@ function createRaid(){
 
   echo "Writing in fstab for persistency..."
   # Entry in /etc/fstab for persitency
-  echo "UUID=$raidUUID $raidMountPoint  ext4 defaults 0 0" >> /etc/fstab
+  echo "UUID=$raidUUID $raidMountPoint  ext4 defaults 0 0" | tee -a /etc/fstab
+
+  ### echo "UUID=$raidUUID $raidMountPoint  ext4 defaults 0 0" >> /etc/fstab
 
   # Print infos
   echo "======== RAID INFOS ========"
