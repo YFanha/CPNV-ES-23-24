@@ -1,5 +1,11 @@
 #! /bin/bash
 
+IPaddr="10.10.10.33/24"
+IPgateway="10.10.10.11"
+
+LAN_NIC=$(ip -o -4 route show to default | awk '{print $5}')
+
+apt-get update -y
 
 # OpenMediaVault commands
 
@@ -10,8 +16,11 @@ chmod -R go= /root/.ssh
 chown -R root:root /root/.ssh
 
 # ---- IP ----
-file="/etc/network/interfaces
+file="/etc/network/interfaces"
 cat <<EOM >$file
+# This file describes the network interfaces available on your system
+# and how to activate them. For more information, see interfaces(5).
+
 source /etc/network/interfaces.d/*
 
 # The loopback network interface
@@ -19,10 +28,10 @@ auto lo
 iface lo inet loopback
 
 # The primary network interface
-allow-hotplug ens33
-iface ens33 inet static
-address 10.10.10.33/24
-gateway 10.10.10.11
+auto $LAN_NIC
+iface $LAN_NIC inet static
+address $IPaddr
+gateway $IPgateway
 
 EOM
 

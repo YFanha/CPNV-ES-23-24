@@ -94,7 +94,7 @@ loginShell: /bin/bash
 uidNumber: 10001
 gidNumber: 20000
 displayName: Man 2
-homeDirectory: /home/man1
+homeDirectory: /home/man2
 mail: man2@$DOMAIN
 description: Man 2 account
 
@@ -112,7 +112,7 @@ loginShell: /bin/bash
 uidNumber: 10010
 gidNumber: 20010
 displayName: Ing 1
-homeDirectory: /home/man1
+homeDirectory: /home/ing1
 mail: ing1@$DOMAIN
 description: Ing 1 account
 
@@ -130,7 +130,7 @@ loginShell: /bin/bash
 uidNumber: 10011
 gidNumber: 20010
 displayName: Ing 2
-homeDirectory: /home/man1
+homeDirectory: /home/ing2
 mail: ing2@$DOMAIN
 description: Ing 2 account
 
@@ -148,7 +148,7 @@ loginShell: /bin/bash
 uidNumber: 10020
 gidNumber: 20020
 displayName: Dev 1
-homeDirectory: /home/man1
+homeDirectory: /home/dev1
 mail: dev1@$DOMAIN
 description: Dev 1 account
 EOM
