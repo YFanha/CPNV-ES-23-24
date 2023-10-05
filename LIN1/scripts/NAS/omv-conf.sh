@@ -22,6 +22,7 @@ iface lo inet loopback
 allow-hotplug ens33
 iface ens33 inet static
 address 10.10.10.33/24
+gateway 10.10.10.11
 
 EOM
 

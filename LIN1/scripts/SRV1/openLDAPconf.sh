@@ -3,7 +3,7 @@
 LDAP_BASE="dc=lin1,dc=local"
 LdapAdminCNString="cn=admin,$LDAP_BASE"
 LDAPPWD="LIL-fesm-zont"
-USRPWD="Pa$$w0rd"
+USRPWD='Pa$$w0rd'
 DOMAIN="lin1.local"
 LDAP_IP="10.10.10.11"
 
@@ -69,7 +69,7 @@ objectClass: shadowAccount
 objectClass: person
 uid: man1
 userPassword: {crypt}x
-cn: Man 1
+cn: Man1
 givenName: Man
 sn: 1
 loginShell: /bin/bash
@@ -87,7 +87,7 @@ objectClass: shadowAccount
 objectClass: person
 uid: man2
 userPassword: {crypt}x
-cn: Man 2
+cn: Man2
 givenName: Man
 sn: 2
 loginShell: /bin/bash
@@ -105,7 +105,7 @@ objectClass: shadowAccount
 objectClass: person
 uid: ing1
 userPassword: {crypt}x
-cn: Ing 1
+cn: Ing1
 givenName: Ing
 sn: 1
 loginShell: /bin/bash
@@ -123,7 +123,7 @@ objectClass: shadowAccount
 objectClass: person
 uid: ing2
 userPassword: {crypt}x
-cn: Ing 2
+cn: Ing2
 givenName: Ing
 sn: 2
 loginShell: /bin/bash
@@ -141,7 +141,7 @@ objectClass: shadowAccount
 objectClass: person
 uid: dev1
 userPassword: {crypt}x
-cn: Dev 1
+cn: Dev1
 givenName: Dev
 sn: 1
 loginShell: /bin/bash
