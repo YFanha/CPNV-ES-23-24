@@ -186,7 +186,9 @@ sed -i "s|<secret>|$rndc_SECRET|g" $rndc_DNS_FILE
 cp $rndc_DNS_FILE $rndc_DHCP_FILE
 
 # LDAP configuration
-
+wget https://raw.githubusercontent.com/YFanha/CPNV-ES-23-24/main/LIN1/scripts/SRV1/annexes/openLDAPconf.sh
+chmod +x openLDAPconf.sh
+bash openLDAPconf.sh
 
 # Restart all services
 systemctl restart bind9
