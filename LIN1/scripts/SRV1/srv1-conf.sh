@@ -1,5 +1,7 @@
 #! /bin/bash
 
+adminSSHKey="ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOGVi0MNingnvScAJJHb9+EYPngweg1PJfgUfsN5vwSS"
+
 IPaddr="10.10.10.11/24"
 IPgateway="10.10.10.11"
 DNSIPADDRESS='10.10.10.11'
@@ -34,7 +36,7 @@ apt-get update -y
 
 # ---- SSH ----
 mkdir -p /root/.ssh
-echo "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOGVi0MNingnvScAJJHb9+EYPngweg1PJfgUfsN5vwSS" >> /root/.ssh/authorized_keys
+echo $adminSSHKey >> /root/.ssh/authorized_keys
 chmod -R go= /root/.ssh
 chown -R root:root /root/.ssh
 
@@ -58,6 +60,8 @@ iface $LAN_NIC inet static
 address $IPaddr
 
 EOM
+
+systemctl restart networking
 
 # Transformer notre serveur en "passerelle"
 echo "net.ipv4.ip_forward=1" >> /etc/sysctl.conf
@@ -131,7 +135,7 @@ cat <<EOM >$dhcp_file
 option domain-name "$DOMAIN";
 option domain-name-servers $DNSIPADDRESS;
 
-include "/etc/dhcp/rndc.conf";
+include "$rndc_DHCP_FILE";
 
 ddns-updates on;
 default-lease-time 600;
@@ -162,7 +166,7 @@ subnet 10.10.10.0 netmask 255.255.255.0 {
 
 EOM
 
-# Dynamic DNS
+# Dynamic DNS - RNDC KEY
 cat <<EOM >$rndc_DNS_FILE
 key "rndc-key" {
         algorithm <algo>;
@@ -180,3 +184,11 @@ sed -i "s|<algo>|$rndc_ALGO|g" $rndc_DNS_FILE
 sed -i "s|<secret>|$rndc_SECRET|g" $rndc_DNS_FILE
 
 cp $rndc_DNS_FILE $rndc_DHCP_FILE
+
+# LDAP configuration
+
+
+# Restart all services
+systemctl restart bind9
+systemctl restart isc-dhcp-server.service
+systemctl restart slapd
