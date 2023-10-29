@@ -208,7 +208,7 @@ subnet 10.10.10.0 netmask 255.255.255.0 {
 
 EOM
 
-echo INTERFACESv4="$LAN_NIC" > /etc/default/isc-dhcp-server
+echo "INTERFACESv4=$LAN_NIC" > /etc/default/isc-dhcp-server
 
 # Dynamic DNS - RNDC KEY
 cat <<EOM >$rndc_DNS_FILE
