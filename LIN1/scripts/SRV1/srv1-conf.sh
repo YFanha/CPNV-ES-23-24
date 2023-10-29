@@ -74,16 +74,6 @@ iptable-save > /etc/iptables/rules.v4
 echo 'make_resolv_conf() { :; }' > /etc/dhcp/dhclient-enter-hooks.d/leave_my_resolv_conf_alone
 chmod 755 /etc/dhcp/dhclient-enter-hooks.d/leave_my_resolv_conf_alone
 
-# Resolv.conf
-resolve_FILE="/etc/resolv.conf"
-cat <<EOM >$resolve_FILE
-
-domain $DOMAIN
-search $DOMAIN
-nameserver $DNSIPADDRESS
-
-EOM
-
 # Hostname
 
 hostnamectl set-hostname $SRV01.$DOMAIN
@@ -125,7 +115,17 @@ zone "$REVERSE_ZONE" {
 };
 EOM
 
-...
+
+# Resolv.conf
+resolve_FILE="/etc/resolv.conf"
+cat <<EOM >$resolve_FILE
+
+domain $DOMAIN
+search $DOMAIN
+nameserver $DNSIPADDRESS
+
+EOM
+
 
 # DHCP
 apt-get install isc-dhcp-server -y
