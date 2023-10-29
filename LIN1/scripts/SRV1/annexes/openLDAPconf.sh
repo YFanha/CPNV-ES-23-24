@@ -6,6 +6,20 @@ LDAPPWD="LIL-fesm-zont"
 USRPWD='Pa$$w0rd'
 DOMAIN="lin1.local"
 LDAP_IP="10.10.10.11"
+OU='lin1'
+
+
+echo -e " \ 
+slapd slapd/password2 password $LDAPPWD
+slapd slapd/password1 password $LDAPPWD
+slapd slapd/move_old_database boolean true
+slapd shared/organization string $OU
+slapd slapd/no_configuration boolean false
+slapd slapd/purge_database boolean false
+slapd slapd/domain string $DOMAIN
+" | debconf-set-selections
+
+export DEBIAN_FRONTEND=noninteractive
 
 apt-get install slapd ldap-utils -y
 

@@ -171,7 +171,7 @@ EOM
 
 # DHCP
 apt-get install isc-dhcp-server -y
-dhcp_file="/etc/dhcp/dhcp.conf"
+dhcp_file="/etc/dhcp/dhcpd.conf"
 cat <<EOM >$dhcp_file
 
 option domain-name "$DOMAIN";
@@ -207,6 +207,8 @@ subnet 10.10.10.0 netmask 255.255.255.0 {
 }
 
 EOM
+
+echo INTERFACESv4="$LAN_NIC" > /etc/default/isc-dhcp-server
 
 # Dynamic DNS - RNDC KEY
 cat <<EOM >$rndc_DNS_FILE
