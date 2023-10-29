@@ -7,6 +7,7 @@ USRPWD='Pa$$w0rd'
 DOMAIN="lin1.local"
 LDAP_IP="10.10.10.11"
 
+apt-get install slapd ldap-utils -y
 
 mkdir /etc/ldap/content
 
@@ -198,4 +199,5 @@ ldapadd -x -D "$LdapAdminCNString" -f /etc/ldap/content/groups.ldif -w $LDAPPWD
 ldapmodify -x -D "$LdapAdminCNString" -f /etc/ldap/content/addtogroup.ldif -w $LDAPPWD
 
 
+systemctl restart slapd
 apt-get install ldap-account-manager -y
