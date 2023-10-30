@@ -6,13 +6,13 @@ IPaddr="10.10.10.22/24"
 IPgateway="10.10.10.11"
 
 # NEXTCLOUD variables
-$SERVICE="nextcloud"
-$SRV_ADM="yann.fanha@eduvaud.ch"
-$DOC_ROOT="/var/www/html/nextcloud/"
-$SRV_NAME="srv-lin1-02.lin1.local"
-$SRV_IP="10.10.10.22"
-$SRV_ALIAS=$SRV_IP
-$CONF_FILE="/etc/apache2/sites-available/$SERVICE.conf"
+SERVICE="nextcloud"
+SRV_ADM="yann.fanha@eduvaud.ch"
+DOC_ROOT="/var/www/html/nextcloud/"
+SRV_NAME="srv-lin1-02.lin1.local"
+SRV_IP="10.10.10.22"
+SRV_ALIAS=$SRV_IP
+CONF_FILE="/etc/apache2/sites-available/$SERVICE.conf"
 
 LAN_NIC=$(ip -o -4 route show to default | awk '{print $5}')
 
