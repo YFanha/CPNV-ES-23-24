@@ -66,7 +66,12 @@ systemctl restart networking
 # Transformer notre serveur en "passerelle"
 echo "net.ipv4.ip_forward=1" >> /etc/sysctl.conf
 
-apt-get install iptables iptables-persistent -y
+apt-get install iptables -y
+
+echo iptables-persistent iptables-persistent/autosave_v4 boolean true | sudo debconf-set-selections
+echo iptables-persistent iptables-persistent/autosave_v6 boolean true | sudo debconf-set-selections
+
+apt-get install iptables-persistent -y
 iptables -t nat -A POSTROUTING -o $WAN_NIC -j MASQUERADE
 iptables-save > /etc/iptables/rules.v4
 
@@ -79,6 +84,7 @@ chmod 755 /etc/dhcp/dhclient-enter-hooks.d/leave_my_resolv_conf_alone
 hostnamectl set-hostname $SRV01.$DOMAIN
 
 # DNS
+echo "INSTALLING BIND ================================================================================"
 apt-get install bind9 -y
 
 dns_file="/etc/bind/named.conf.options"
@@ -115,7 +121,7 @@ zone "$REVERSE_ZONE" {
 };
 EOM
 
-mkdir /var/lib/bind/zones
+mkdir -p /var/lib/bind/zones
 
 ORIGIN='$ORIGIN'
 TTL='$TTL'
@@ -172,6 +178,7 @@ EOM
 
 
 # DHCP
+echo "INSTALLING isc-dhcp-server ================================================================================"
 apt-get install isc-dhcp-server -y
 dhcp_file="/etc/dhcp/dhcpd.conf"
 cat <<EOM >$dhcp_file
