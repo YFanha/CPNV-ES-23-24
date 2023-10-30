@@ -68,7 +68,7 @@ echo "net.ipv4.ip_forward=1" >> /etc/sysctl.conf
 
 apt-get install iptables iptables-persistent -y
 iptables -t nat -A POSTROUTING -o $WAN_NIC -j MASQUERADE
-iptable-save > /etc/iptables/rules.v4
+iptables-save > /etc/iptables/rules.v4
 
  # Prevent the DHCP client from rewriting the resolv.conf file
 echo 'make_resolv_conf() { :; }' > /etc/dhcp/dhclient-enter-hooks.d/leave_my_resolv_conf_alone
@@ -115,47 +115,49 @@ zone "$REVERSE_ZONE" {
 };
 EOM
 
-mkdir /etc/bind/zones
+mkdir /var/lib/bind/zones
+
+ORIGIN='$ORIGIN'
+TTL='$TTL'
 
 zoneDirecte="/var/lib/bind/zones/db.$DOMAIN"
 cat <<EOM >$zoneDirecte
 $ORIGIN .
 $TTL 86400      ; 1 day
-$DOMAIN         IN SOA  $SRV01.$DOMAIN. root.$DOMAIN. (
-                                12         ; serial
-                                604800     ; refresh (1 week)
-                                86400      ; retry (1 day)
-                                2419200    ; expire (4 weeks)
-                                86400      ; minimum (1 day)
-                                )
-                        NS      $DOMAIN.
-                        A       $srv01_ip
+$DOMAIN IN      SOA     $SRV01.$DOMAIN. root.$DOMAIN. (
+                        12         ; serial
+                        604800     ; refresh (1 week)
+                        86400      ; retry (1 day)
+                        2419200    ; expire (4 weeks)
+                        86400      ; minimum (1 day)
+                        )
+        NS      $DOMAIN.
+        A       $srv01_ip
 $ORIGIN $DOMAIN.
-nas                     CNAME   $SRV03
-nas-lin1-01             A       $srv03_ip
-srv-lin1-01             A       $srv01_ip
-srv-lin1-02             A       $srv02_ip
-srv1                    CNAME   $SRV01
-srv2                    CNAME   $SRV02
+nas             CNAME   $SRV03
+nas-lin1-01     A       $srv03_ip
+srv-lin1-01     A       $srv01_ip
+srv-lin1-02     A       $srv02_ip
+srv1            CNAME   $SRV01
+srv2            CNAME   $SRV02
 EOM
 
 zoneInverse="/var/lib/bind/zones/db.$REVERSE_ZONE"
 cat <<EOM >$zoneInverse
 $ORIGIN .
 $TTL 86400      ; 1 day
-$REVERSE_ZONE   IN SOA  $SRV01.$DOMAIN. root.$DOMAIN. (
-                                9          ; serial
-                                604800     ; refresh (1 week)
-                                86400      ; retry (1 day)
-                                2419200    ; expire (4 weeks)
-                                86400      ; minimum (1 day)
-                                )
+@       IN      SOA     $SRV01.$DOMAIN. root.$DOMAIN. (
+                        9          ; serial
+                        604800     ; refresh (1 week)
+                        86400      ; retry (1 day)
+                        2419200    ; expire (4 weeks)
+                        86400      ; minimum (1 day)
+                        )
                         NS      lin1.local.
 $ORIGIN $REVERSE_ZONE.
-11                      PTR     $SRV01.
-22                      PTR     $SRV01.
-33                      PTR     $SRV03.
-
+11      PTR     $SRV01.
+22      PTR     $SRV01.
+33      PTR     $SRV03.
 EOM
 
 # Resolv.conf
@@ -232,6 +234,8 @@ cp $rndc_DNS_FILE $rndc_DHCP_FILE
 # Restart all services
 systemctl restart bind9
 systemctl restart isc-dhcp-server.service
+
+chown -R bind:bind /var/lib/bind/zones
 
 # LDAP configuration
 wget https://raw.githubusercontent.com/YFanha/CPNV-ES-23-24/main/LIN1/scripts/SRV1/annexes/openLDAPconf.sh
