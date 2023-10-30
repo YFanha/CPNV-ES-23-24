@@ -12,9 +12,10 @@ DOC_ROOT="/var/www/html/nextcloud/"
 SRV_NAME="srv-lin1-02.lin1.local"
 SRV_IP="10.10.10.22"
 SRV_ALIAS=$SRV_IP
-CONF_FILE="/etc/apache2/sites-available/$SERVICE.conf"
 
 LAN_NIC=$(ip -o -4 route show to default | awk '{print $5}')
+
+hostnamectl set-hostname $SRV_NAME
 
 apt-get update -y
 
@@ -53,7 +54,7 @@ unzip ~/latest.zip
 mv ~/nextcloud /var/www/html/
 chown -R www-data:www-data /var/www/html/nextcloud
 
-file=/etc/apache2/sites-available/nextcloud.conf
+file=/etc/apache2/sites-available/$SERVICE.conf
 cat <<EOM >$file
 <VirtualHost *:80>
      ServerAdmin $SRV_ADM
@@ -79,10 +80,10 @@ cat <<EOM >$file
 </VirtualHost>
 EOM
 
-a2ensite $CONF_FILE
+a2ensite $SERVICE
 a2dissite 000-default.conf
 a2enmod headers rewrite env dir mime
-systemctl reload apache2
+systemctl restart apache2
 
 echo "=============================================="
 echo "=============================================="

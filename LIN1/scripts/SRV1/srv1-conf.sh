@@ -29,7 +29,7 @@ rndc_DHCP_FILE="/etc/dhcp/rndc.conf"
 WAN_NIC=$(ip -o -4 route show to default | awk '{print $5}')
 
 # Interface réseau LAN
-LAN_NIC=$(ip link | awk -F: '$0 !~ "lo|vir|wl|^[^0-9]"{print $2a;getline}' | grep -v $WAN_NIC)
+LAN_NIC=$(ip link | awk -F: '$0 !~ "lo|vir|wl|^[^0-9]"{print $2a;getline}' | grep -v $WAN_NIC | sed 's/ //g')
 
 
 apt-get update -y
