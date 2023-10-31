@@ -85,6 +85,8 @@ a2dissite 000-default.conf
 a2enmod headers rewrite env dir mime
 systemctl restart apache2
 
+systemctl restart networking
+
 echo "=============================================="
 echo "=============================================="
 echo "Il est nécessaire de créer la base de données et son utilisateur manuellement"
