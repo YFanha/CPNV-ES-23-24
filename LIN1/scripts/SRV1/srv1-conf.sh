@@ -1,5 +1,6 @@
 #! /bin/bash
 
+# VARIABLE
 adminSSHKey="ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOGVi0MNingnvScAJJHb9+EYPngweg1PJfgUfsN5vwSS"
 
 IPaddr="10.10.10.11/24"
@@ -34,13 +35,13 @@ LAN_NIC=$(ip link | awk -F: '$0 !~ "lo|vir|wl|^[^0-9]"{print $2a;getline}' | gre
 
 apt-get update -y
 
-# ---- SSH ----
+# ---- Setup SSH with admin key ----
 mkdir -p /root/.ssh
 echo $adminSSHKey >> /root/.ssh/authorized_keys
 chmod -R go= /root/.ssh
 chown -R root:root /root/.ssh
 
-# IP conf
+# ---- Network configuration ----
 net_FILE="/etc/network/interfaces"
 cat <<EOM >$net_FILE
 
@@ -58,12 +59,11 @@ iface $WAN_NIC inet dhcp
 auto $LAN_NIC
 iface $LAN_NIC inet static
 address $IPaddr
-
 EOM
 
 systemctl restart networking
 
-# Transformer notre serveur en "passerelle"
+# ---- Transformer le serveur en "passerelle" ----
 echo "net.ipv4.ip_forward=1" >> /etc/sysctl.conf
 
 apt-get install iptables -y
@@ -75,16 +75,15 @@ apt-get install iptables-persistent -y
 iptables -t nat -A POSTROUTING -o $WAN_NIC -j MASQUERADE
 iptables-save > /etc/iptables/rules.v4
 
- # Prevent the DHCP client from rewriting the resolv.conf file
+# Prevent the DHCP client from rewriting the resolv.conf file
 echo 'make_resolv_conf() { :; }' > /etc/dhcp/dhclient-enter-hooks.d/leave_my_resolv_conf_alone
 chmod 755 /etc/dhcp/dhclient-enter-hooks.d/leave_my_resolv_conf_alone
 
-# Hostname
-
+# ---- Hostname ----
 hostnamectl set-hostname $SRV01.$DOMAIN
 
-# DNS
-echo "INSTALLING BIND ================================================================================"
+# ---- DNS ----
+echo "====== INSTALLING BIND ======"
 apt-get install bind9 -y
 
 dns_file="/etc/bind/named.conf.options"
@@ -166,7 +165,7 @@ $ORIGIN $REVERSE_ZONE.
 33      PTR     $SRV03.
 EOM
 
-# Resolv.conf
+# Update Resolv.conf
 resolve_FILE="/etc/resolv.conf"
 cat <<EOM >$resolve_FILE
 
@@ -177,8 +176,8 @@ nameserver $DNSIPADDRESS
 EOM
 
 
-# DHCP
-echo "INSTALLING isc-dhcp-server ================================================================================"
+# ---- DHCP ----
+echo "====== INSTALLING isc-dhcp-server ======"
 apt-get install isc-dhcp-server -y
 dhcp_file="/etc/dhcp/dhcpd.conf"
 cat <<EOM >$dhcp_file
@@ -219,7 +218,8 @@ EOM
 
 echo "INTERFACESv4=$LAN_NIC" > /etc/default/isc-dhcp-server
 
-# Dynamic DNS - RNDC KEY
+# ---- Dynamic DNS - RNDC KEY ----
+# -> Générer la clé dans un fichier temporaire et update celui du DNS (+ Copie dans le dossier /etc/dhcp/)
 cat <<EOM >$rndc_DNS_FILE
 key "rndc-key" {
         algorithm <algo>;
@@ -238,13 +238,15 @@ sed -i "s|<secret>|$rndc_SECRET|g" $rndc_DNS_FILE
 
 cp $rndc_DNS_FILE $rndc_DHCP_FILE
 
-# Restart all services
-systemctl restart bind9
+# ---- Restart all services ----
+systemctl restart named
 systemctl restart isc-dhcp-server.service
 
 chown -R bind:bind /var/lib/bind/zones
 
-# LDAP configuration
+# ---- LDAP configuration (download and execution du script) ----
 wget https://raw.githubusercontent.com/YFanha/CPNV-ES-23-24/main/LIN1/scripts/SRV1/annexes/openLDAPconf.sh
 chmod +x openLDAPconf.sh
 bash openLDAPconf.sh
+
+rm openLDAPconf.sh
