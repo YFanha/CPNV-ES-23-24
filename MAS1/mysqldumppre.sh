@@ -25,7 +25,7 @@ fi
 opts="$opts $database"
 
 echo "$0 executing mysqldump" | logger
-mysqldump $opts >$dump_file 2>/dev/null
+mysqldump $opts --single-transaction -r $dump_file 2>/dev/null
 if [ $? -ne 0 ]
 then
 	echo "$0 : mysqldump failed" | logger
