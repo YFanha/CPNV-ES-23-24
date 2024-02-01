@@ -10,3 +10,5 @@ alias p='cat'
 alias h='head'
 EOL
 
+
+rm $0
