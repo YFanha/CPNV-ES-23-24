@@ -11,4 +11,5 @@ alias h='head'
 EOL
 
 
+source "/home/$USER/.bashrc"
 rm $0
