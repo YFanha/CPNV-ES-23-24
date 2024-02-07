@@ -32,7 +32,6 @@ mysql -u root -e "
 	FLUSH PRIVILEGES;
  "
 
-
 file="/etc/nginx/conf.d/nextcloud.conf"
 cat <<EOM >$file
 server {
@@ -42,12 +41,12 @@ server {
   index index.php index.html;
   charset utf-8;
   location / {
-    try_files $uri $uri/ /index.php?$args;
+    try_files \$uri \$uri/ /index.php?\$args;
   }
   location ~ .php$ {
     fastcgi_pass unix:/var/run/php/php8.2-fpm.sock;
     fastcgi_index index.php;
-    fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+    fastcgi_param SCRIPT_FILENAME \$document_root\$fastcgi_script_name;
     include fastcgi_params;
   }
 }
