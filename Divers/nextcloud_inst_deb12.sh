@@ -32,7 +32,7 @@ mysql -u root -e "
 	FLUSH PRIVILEGES;
  "
 
-file="/etc/nginx/conf.d/nextcloud.conf"
+file="/etc/nginx/sites-available/nextcloud.conf"
 cat <<EOM >$file
 server {
   listen 80;
@@ -51,5 +51,9 @@ server {
   }
 }
 EOM
+
+ln -s "/etc/nginx/sites-available/nextcloud.conf" "/etc/nginx/sites-enabled/nextcloud.conf"
+
+systemctl reload nginx
 
 rm -f $0
