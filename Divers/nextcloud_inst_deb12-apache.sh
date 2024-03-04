@@ -36,7 +36,8 @@ file="/etc/apache2/sites-available/nextcloud.conf"
 cat <<EOM >$file
 <VirtualHost *:80>
      DocumentRoot /var/www/nextcloud
-     ServerName $ip $serverName
+     ServerName $serverName
+     ServerAlias $ip
 
     <Directory /var/www/nextcloud>
          Options FollowSymlinks
@@ -44,9 +45,11 @@ cat <<EOM >$file
          Require all granted
      </Directory>
 
-ErrorLog ${APACHE_LOG_DIR}/$serverName_error2024.log
+ErrorLog \${APACHE_LOG_DIR}/${serverName}_error2024.log
 
-CustomLog ${APACHE_LOG_DIR}/$serverName_access2024.log combined
+CustomLog \${APACHE_LOG_DIR}/${serverName}_access2024.log combined
+
+</VirtualHost>
 EOM
 
 ln -s "/etc/apache2/sites-available/nextcloud.conf" "/etc/apache2/sites-enabled/nextcloud.conf"
