@@ -146,17 +146,6 @@ $ORIGIN $REVERSE_ZONE.
 10      PTR     $SRV01.
 EOM
 
-# Update Resolv.conf
-resolve_FILE="/etc/resolv.conf"
-cat <<EOM >$resolve_FILE
-
-domain $DOMAIN
-search $DOMAIN
-nameserver $DNSIPADDRESS
-
-EOM
-
-
 # ---- DHCP ----
 echo "====== INSTALLING isc-dhcp-server ======"
 apt-get install isc-dhcp-server -y
@@ -218,6 +207,16 @@ sed -i "s|<algo>|$rndc_ALGO|g" $rndc_DNS_FILE
 sed -i "s|<secret>|$rndc_SECRET|g" $rndc_DNS_FILE
 
 cp $rndc_DNS_FILE $rndc_DHCP_FILE
+
+# Update Resolv.conf
+resolve_FILE="/etc/resolv.conf"
+cat <<EOM >$resolve_FILE
+
+domain $DOMAIN
+search $DOMAIN
+nameserver $DNSIPADDRESS
+
+EOM
 
 # ---- Restart all services ----
 systemctl restart named
