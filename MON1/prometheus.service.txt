@@ -1,0 +1,26 @@
+[Unit]
+Description=Prometheus
+Documentation=https://prometheus.io/docs/introduction/overview/
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+User=prometheus
+Group=prometheus
+ExecReload=/bin/kill -HUP $MAINPID
+ExecStart=/usr/local/bin/prometheus \
+  --config.file=/app/prometheus2.51.2/prometheus.yml \
+  --storage.tsdb.path=/var/lib/prometheus \
+  --web.console.templates=/app/prometheus2.51.2/consoles \
+  --web.console.libraries=/app/prometheus2.51.2/console_libraries \
+  --web.listen-address=0.0.0.0:9090 \
+  --web.config.file=/app/prometheus2.51.2/web.yml \
+
+SyslogIdentifier=prometheus
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+
+EOM

@@ -1,0 +1,95 @@
+---
+- name: Install and configure Prometheus
+  hosts: your_target_server (Ubuntu 22.04)
+  become: yes
+  vars:
+      users: a-fanha
+      app_root_dir: "/app/prometheus2.51.1"
+      prom_source_url: "https://github.com/prometheus/prometheus/releases/download/v2.51.2/prometheus-2.51.2.linux-amd64.tar.gz"
+      prom_archive_dest: "/tmp/prometheus-2.51.2.linux-amd64.tar.gz"
+      prom_tmp_dir: "/tmp/prometheus-2.51.2"
+  tasks:
+	  - name: Download Prometheus binary tarball
+		  get_url:
+	    url: "https://github.com/prometheus/prometheus/releases/download/v2.51.2/prometheus-2.51.2.linux-amd64.tar.gz"
+	    dest: "{{ prom_archive_dest }}"
+
+    - name: Extract Prometheus binary tarball
+      ansible.builtin.unarchive:
+        src: "{{ prom_archive_dest }}"
+        dest: "{{ prom_tmp_dir }}"
+
+    - name: Create appplication directory
+      file:
+        path: "{{ prom_source_url }}"
+        state: directory
+        recurse: yes
+        owner: yann
+        group: yann
+        mode: 751
+	    
+    - name: Create directories for Prometheus with permissions
+      file:
+        path: "{{ item }}"
+        state: directory
+        owner: prometheus
+        group: prometheus
+        mode: "775"
+      loop:
+        - "{{ prom_source_url }}/rules"
+        - "{{ prom_source_url }}/rules.d"
+        - "{{ prom_source_url }}/files_sd"
+        - /var/lib/prometheus
+      
+    - name: Move Prometheus binaries and configuration files
+      copy:
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
+        owner: "{{ item.owner }}"
+        group: "{{ item.group }}"
+        mode: "{{ item.mode }}"
+      with_items:
+        - { src: "{{ prom_tmp_dir }}/consoles", dest: "{{ prom_source_url }}/", owner: "yann", group: "yann", mode: "0644" }
+        - { src: "{{ prom_tmp_dir }}/console_libraries", dest: "{{ prom_source_url }}/", owner: "yann", group: "yann", mode: "0644" }
+        - { src: "{{ prom_tmp_dir }}/prometheus.yml", dest: "{{ prom_source_url }}/", owner: "yann", group: "yann", mode: "0644" }
+    
+    - name: Copy prometheus and promtool binaries to /usr/local/bin/
+      ansible.builtin.copy:
+        src: "{{ item }}"
+        dest: "/usr/local/bin/"
+        mode: "0755"
+      with_items:
+      - "{{ prom_tmp_dir }}/prometheus"
+      - "{{ prom_tmp_dir }}/promtool"
+
+
+    - name: Create Prometheus user
+      user:
+        name: prometheus
+        shell: /sbin/nologin
+        system: yes
+    
+    - name: Installing htpasswd
+      apt:
+        name: apache2-utils
+        state: latest
+
+    - name: Create file web.yml
+      # Group with command htpasswd + template 
+
+
+    - name: Create Prometheus.service
+      # Template
+
+
+
+    ## Reload configuration
+    - name: Reload systemd to apply configuration
+      systemd:
+        daemon_reload: yes
+
+    - name: Start Prometheus service
+      service:
+        name: prometheus
+        state: started
+        enabled: yes
