@@ -3,7 +3,7 @@
   hosts: your_target_server (Ubuntu 22.04)
   become: yes
   vars:
-      users: a-fanha
+      user: promadm
       app_root_dir: "/app/prometheus2.51.1"
       prom_source_url: "https://github.com/prometheus/prometheus/releases/download/v2.51.2/prometheus-2.51.2.linux-amd64.tar.gz"
       prom_archive_dest: "/tmp/prometheus-2.51.2.linux-amd64.tar.gz"
@@ -21,7 +21,7 @@
 
     - name: Create appplication directory
       file:
-        path: "{{ prom_source_url }}"
+        path: "{{ app_root_dir }}"
         state: directory
         recurse: yes
         owner: yann
@@ -36,9 +36,9 @@
         group: prometheus
         mode: "775"
       loop:
-        - "{{ prom_source_url }}/rules"
-        - "{{ prom_source_url }}/rules.d"
-        - "{{ prom_source_url }}/files_sd"
+        - "{{ app_root_dir }}/rules"
+        - "{{ app_root_dir }}/rules.d"
+        - "{{ app_root_dir }}/files_sd"
         - /var/lib/prometheus
       
     - name: Move Prometheus binaries and configuration files
@@ -49,9 +49,9 @@
         group: "{{ item.group }}"
         mode: "{{ item.mode }}"
       with_items:
-        - { src: "{{ prom_tmp_dir }}/consoles", dest: "{{ prom_source_url }}/", owner: "yann", group: "yann", mode: "0644" }
-        - { src: "{{ prom_tmp_dir }}/console_libraries", dest: "{{ prom_source_url }}/", owner: "yann", group: "yann", mode: "0644" }
-        - { src: "{{ prom_tmp_dir }}/prometheus.yml", dest: "{{ prom_source_url }}/", owner: "yann", group: "yann", mode: "0644" }
+        - { src: "{{ prom_tmp_dir }}/consoles", dest: "{{ app_root_dir }}/", owner: "yann", group: "yann", mode: "0644" }
+        - { src: "{{ prom_tmp_dir }}/console_libraries", dest: "{{ app_root_dir }}/", owner: "yann", group: "yann", mode: "0644" }
+        - { src: "{{ prom_tmp_dir }}/prometheus.yml", dest: "{{ app_root_dir }}/", owner: "yann", group: "yann", mode: "0644" }
     
     - name: Copy prometheus and promtool binaries to /usr/local/bin/
       ansible.builtin.copy:
@@ -75,7 +75,7 @@
         state: latest
 
     - name: Create file web.yml
-      # Group with command htpasswd + template 
+      # Group with command htpasswd + template (prom_user & prom_user_pass)
 
 
     - name: Create Prometheus.service
