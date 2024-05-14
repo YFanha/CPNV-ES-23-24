@@ -1,0 +1,7 @@
+graf_tmp_dir: "/tmp"
+graf_ini_file: "/etc/grafana/grafana.ini"
+graf_ini_config:
+  - key: 'http_port'
+    value: 3000
+  - key: 'http_addr'
+    value: '127.0.0.1'

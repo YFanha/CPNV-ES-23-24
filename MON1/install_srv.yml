@@ -93,3 +93,48 @@
         name: prometheus
         state: started
         enabled: yes
+    
+    # Grafana
+    - name: Install required packages
+      apt:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - gnupg2
+        - apt-transport-https
+        - software-properties-common
+        - wget
+
+    - name: Add Grafana GPG key
+      ansible.builtin.shell: "cat grafana.key | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/grafana.gpg >/dev/null"
+
+    - name: Add Grafana repository
+      ansible.builtin.shell: "echo 'deb [signed-by=/etc/apt/trusted.gpg.d/grafana.gpg] https://packages.grafana.com/oss/deb stable main' | sudo tee /etc/apt/sources.list.d/grafana.list"
+
+    - name: Update apt cache
+      ansible.builtin.apt:
+        update_cache: yes
+
+    - name: Install Grafana
+      ansible.builtin.apt:
+        name: grafana
+        state: present
+
+    - name: Backup original Grafana configuration
+      ansible.builtin.shell: "cp /etc/grafana/grafana.ini /etc/grafana/grafana.ini.backup"
+      
+      
+    - name: Modifier les lignes commentées dans le fichier de configuration Grafana
+      ansible.builtin.lineinfile:
+        path: /chemin/vers/votre/fichier_de_configuration
+        regexp: '^;(http_addr|http_port)\s*=\s*(.*)'
+        line: '\1 = {{ item.value }}'
+        state: present
+      loop:
+        - { value: 'localhost', key: 'http_addr' }
+        - { value: '3000', key: 'http_port' }
+
+    - name: Restart Grafana service
+      ansible.builtin.systemd:
+        name: grafana-server
+        state: restarted
